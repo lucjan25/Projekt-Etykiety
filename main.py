@@ -1,7 +1,7 @@
 import pymongo
 import PIL
 from barcode import EAN8, EAN13, EAN14
-
+import PyQt5
 
 # codes
 valEAN8 = 12345670
