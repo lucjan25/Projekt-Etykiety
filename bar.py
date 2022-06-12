@@ -1,18 +1,17 @@
-import pymongo
 import PIL
 from barcode import EAN8, EAN13, EAN14
-import PyQt5
+from tkinter import *
 
 # codes
-valEAN8 = 12345670
-invalEAN8 = 12345678
-valEAN13 = 4006381333931
-invalEAN13 = 4006381333932
-valEAN14 = 40063813339314
-invalEAN14 = 40063813339315
+valEAN8 = '12345670'
+invalEAN8 = '12345678'
+valEAN13 = '4006381333931'
+invalEAN13 = '4006381333932'
+valEAN14 = '40063813339314'
+invalEAN14 = '40063813339315'
 
 
-def main():
+def test():
     print(validate(valEAN8))
     print(validate(valEAN8))
     print(validate(invalEAN8))
@@ -48,8 +47,16 @@ def code_to_bar(code):
         bar = EAN13(code)
     elif len(code) == 8:
         bar = EAN8(code)
-    bar.save("new_code")
+    return bar
+    # bar.save("new_code")
+
+def generate(dim, bar, ean, npl, desc):
+    dimensions = [int(d) for d in dim.split('x')]
+    text = npl + '\n' + desc
+    if bar == True:
+        barcode = code_to_bar(ean)
+    
 
 
 if __name__ == "__main__":
-    main()
+    test()
