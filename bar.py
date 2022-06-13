@@ -1,6 +1,6 @@
-import PIL
-from barcode import EAN8, EAN13, EAN14
-from tkinter import *
+from PIL import Image, ImageDraw, ImageFont
+#from barcode import EAN8, EAN13, EAN14
+import barcode
 
 # codes
 valEAN8 = '12345670'
@@ -36,26 +36,75 @@ def validate(code):
 
 
 def code_to_bar(code):
-    if validate(code) == False:
-        bar = EAN14('0000000000000')
-        bar.save("new_code2")
-        return
+    #if validate(code) == False:
+    #    bar = barcode.EAN14('0000000000000', writer=barcode.writer.ImageWriter)
+    #    return bar
+    #    bar.save("new_code2")
+    print(code)
+    options = dict()
     code = str(code)
     if len(code) == 14:
-        bar = EAN14(code)
+        bar = barcode.EAN14(code, writer=barcode.writer.ImageWriter(format='JPEG'))
+        file = bar.save("tempcode")
+        return file
     elif len(code) == 13:
-        bar = EAN13(code)
+        bar = barcode.EAN13(code, writer=barcode.writer.ImageWriter(format='JPEG'))
+        file = bar.save("tempcode")
+        return file
     elif len(code) == 8:
-        bar = EAN8(code)
-    return bar
-    # bar.save("new_code")
+        bar = barcode.EAN8(code, writer=barcode.writer.ImageWriter(format='JPEG'))
+        file = bar.save("tempcode")
+        return file
+    # code = barcode.get('code', line, writer=ImageWriter())  
 
-def generate(dim, bar, ean, npl, desc):
+
+def generate(dim, bl, ean, npl, desc):
     dimensions = [int(d) for d in dim.split('x')]
-    text = npl + '\n' + desc
-    if bar == True:
-        barcode = code_to_bar(ean)
+    text = u'{0}\n{1}'.format(npl, desc)
+    width, height = int(int(dimensions[0])*3.7), int(int(dimensions[1])*3.7)
+    img = Image.new('RGB', (width, height), color = (255,255,255))
+    ft = ImageFont.truetype("arial.ttf", encoding="utf-8")
+    if bl == True:
+        code = code_to_bar(ean)
+        newheight = height / 2
+        newwidth = newheight * width / height
+        codefile = Image.open(code)
+        codefile = codefile.resize((int(newwidth), int(newheight)), Image.ANTIALIAS)
+        codefile.save('tempcode.jpeg')
+    fit_text(img, text, (0,0,0), ft)
+    img.save(str(ean)+'.jpg', 'JPEG')
     
+def break_fix(text, width, font, draw):
+    if not text:
+        return
+    lo = 0
+    hi = len(text)
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        t = text[:mid]
+        w, h = draw.textsize(t, font=font)
+        if w <= width:
+            lo = mid
+        else:
+            hi = mid - 1
+    t = text[:lo]
+    w, h = draw.textsize(t, font=font)
+    yield t, w, h
+    yield from break_fix(text[lo:], width, font, draw)
+
+def fit_text(img, text, color, font):
+    width = img.size[0] - 2
+    draw = ImageDraw.Draw(img)
+    pieces = list(break_fix(text, width, font, draw))
+    height = sum(p[2] for p in pieces)
+    if height > img.size[1]:
+        raise ValueError("text doesn't fit")
+    y = (img.size[1] - height) // 2
+    for t, w, h in pieces:
+        x = (img.size[0] - w) // 2
+        draw.text((x, y), t, font=font, fill=color)
+        y += h
+
 
 
 if __name__ == "__main__":

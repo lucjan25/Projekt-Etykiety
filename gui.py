@@ -1,4 +1,3 @@
-from lib2to3.pgen2.token import RIGHTSHIFTEQUAL
 from tkinter import *
 from tkinter import messagebox
 import tkinter.ttk as ttk
