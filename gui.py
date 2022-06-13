@@ -16,33 +16,21 @@ NAME_PL TEXT NOT NULL,
 NAME_OR TEXT,
 DESC TEXT NOT NULL)
 """)
-# ean = '034000702459'
-# namepl = "Reese's babeczki czekoladowe z masłem orzechowym"
-# nameor = "Reese's peanut butter cups"
-# desc = """Wyprodukowano w Meksyku dla The Hershey Company przez: Hersmex S. de R.I. de C.V.Av."""
-# data_insert = (ean, namepl, nameor, desc)
-# query_insert = 'INSERT INTO BARCODES values(?,?,?,?)'
-# conn.execute(query_insert, data_insert)
 conn.commit()
 conn.close()
 
 
 
 ean_clicked = '0'
-# display_screen = 0
 
 def DisplayForm():
-    #creating window
     global display_screen
     display_screen = Tk()
-    #setting width and height for window
     display_screen.geometry("800x300")
-    #setting title for window
     display_screen.title("projekt 61895")
     global tree
     global SEARCH
     SEARCH = StringVar()
-    #creating frame
     TopViewForm = Frame(display_screen, width=600, bd=1, relief=SOLID)
     TopViewForm.pack(side=TOP, fill=X)
     LeftViewForm = Frame(display_screen, width=300)
@@ -74,7 +62,6 @@ def DisplayForm():
     btn_database = Button(LeftCenterViewForm, text="Usuń zaznaczony", command=RemoveData)
     btn_database.pack(side=TOP, padx=10, pady=10, fill=X)
 
-    #setting scrollbar
     scrollbarx = Scrollbar(MidViewForm, orient=HORIZONTAL)
     scrollbary = Scrollbar(MidViewForm, orient=VERTICAL)
     tree = ttk.Treeview(MidViewForm,columns=("EAN", "Name_pl", "Name_or", "Desc"),
@@ -83,12 +70,12 @@ def DisplayForm():
     scrollbary.pack(side=RIGHT, fill=Y)
     scrollbarx.config(command=tree.xview)
     scrollbarx.pack(side=BOTTOM, fill=X)
-    #setting headings for the columns
+
     tree.heading('EAN', text="EAN", anchor=W)
     tree.heading('Name_pl', text="Nazwa (PL)", anchor=W)
     tree.heading('Name_or', text="Nazwa (oryginał)", anchor=W)
     tree.heading('Desc', text="opis", anchor=W)
-    #setting width of the columns
+
     tree.column('#0', stretch=NO, minwidth=0, width=14)
     tree.column('#1', stretch=NO, minwidth=0, width=80)
     tree.column('#2', stretch=NO, minwidth=0, width=80)
@@ -96,36 +83,23 @@ def DisplayForm():
     tree.bind('<ButtonRelease-1>', selectItem)
     tree.pack()
     DisplayData()
-#function to search data
 
 def SearchRecord():
-    #checking search text is empty or not
     if SEARCH.get() != "":
-        #clearing current display data
         tree.delete(*tree.get_children())
-        #open database
         conn = sqlite3.connect('barcodes.db')
-        #select query with where clause
         cursor=conn.execute("SELECT * FROM BARCODES WHERE NAME_PL LIKE ?", ('%' + str(SEARCH.get()) + '%',))
-        #fetch all matching records
         fetch = cursor.fetchall()
-        #loop for displaying all records into GUI
         for data in fetch:
             tree.insert('', 'end', values=(data))
         cursor.close()
         conn.close()
 
-#defining function to access data from SQLite database
 def DisplayData():
-    #clear current data
     tree.delete(*tree.get_children())
-    # open databse
     conn = sqlite3.connect('barcodes.db')
-    #select query
     cursor=conn.execute("SELECT * FROM BARCODES")
-    #fetch all data from database
     fetch = cursor.fetchall()
-    #loop for displaying all data in GUI
     for data in fetch:
         tree.insert('', 'end', values=(data))
     cursor.close()

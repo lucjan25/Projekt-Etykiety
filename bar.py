@@ -36,10 +36,10 @@ def validate(code):
 
 
 def code_to_bar(code):
-    #if validate(code) == False:
-    #    bar = barcode.EAN14('0000000000000', writer=barcode.writer.ImageWriter)
-    #    return bar
-    #    bar.save("new_code2")
+    if validate(code) == False:
+        bar = barcode.EAN14('0000000000000', writer=barcode.writer.ImageWriter(format='JPEG'))
+        file = bar.save("tempcode")
+        return file
     print(code)
     options = dict()
     code = str(code)
@@ -55,7 +55,6 @@ def code_to_bar(code):
         bar = barcode.EAN8(code, writer=barcode.writer.ImageWriter(format='JPEG'))
         file = bar.save("tempcode")
         return file
-    # code = barcode.get('code', line, writer=ImageWriter())  
 
 
 def generate(dim, bl, ean, npl, desc):
