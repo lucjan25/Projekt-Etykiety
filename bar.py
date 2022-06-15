@@ -65,11 +65,11 @@ def generate(dim, bl, ean, npl, desc):
     ft = ImageFont.truetype("arial.ttf", encoding="utf-8")
     if bl == True:
         code = code_to_bar(ean)
-        newheight = height / 2
+        newheight = height
         newwidth = newheight * width / height
         codefile = Image.open(code)
         codefile = codefile.resize((int(newwidth), int(newheight)), Image.ANTIALIAS)
-        codefile.save('tempcode.jpeg')
+        codefile.save(str(ean)+'_code.jpeg')
     fit_text(img, text, (0,0,0), ft)
     img.save(str(ean)+'.jpg', 'JPEG')
     
